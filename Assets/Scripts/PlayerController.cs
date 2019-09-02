@@ -68,23 +68,19 @@ public class PlayerController : MonoBehaviour {
 
 	private void ProcessFiring() {
 		if(Input.GetButton("Fire")) {
-			ActivateGuns();
+			SetGunsActive(true);
 		} else {
-			DeactivateGuns();
+			SetGunsActive(false);
 		}
 	}
 
-	private void ActivateGuns() {
+	private void SetGunsActive(bool isActive) {
 		foreach (GameObject gun in guns) {
-			gun.SetActive(true);
+			var particleEmission = gun.GetComponent<ParticleSystem>().emission;
+			particleEmission.enabled = isActive;
 		}
 	}
 
-	private void DeactivateGuns() {
-		foreach(GameObject gun in guns) {
-			gun.SetActive(false);
-		}
-	}
 
 
 }

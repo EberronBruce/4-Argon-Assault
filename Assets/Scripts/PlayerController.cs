@@ -1,33 +1,41 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
 
-public class Player : MonoBehaviour {
+public class PlayerController : MonoBehaviour {
 
-	[Tooltip("In ms^-1")][SerializeField] float speed = 20f;
+	// todo work-out why sometimes slow play onf first play
+
+	[Header("General")]
+	[Tooltip("In ms^-1")][SerializeField] float controlSpeed = 20f;
 	[Tooltip("In m")] [SerializeField] float xRange = 5f;
 	[Tooltip("In m")] [SerializeField] float yRange= 3f;
 
+	[Header("Screen-position Based")]
 	[SerializeField] float positionPitchFactor = -5f;
-	[SerializeField] float controlPitchFactor = -20f;
-
 	[SerializeField] float positionYawFactor = 5f;
+
+	[Header("Control-throw Based")]
+	[SerializeField] float controlPitchFactor = -20f;
 	[SerializeField] float controllRollFactor = -20f;
 
 	float xThrow, yThrow;
+	bool isControlEnabled = true;
 
-	// Start is called before the first frame update
-	void Start() {
-
+	//  Update is called once per frame
+	void Update() {
+		if(isControlEnabled) {
+			ProcessTranslation();
+			ProcessRotation();
+		}
 	}
 
-	// Update is called once per frame
-	void Update() {
-		ProcessTranslation();
-		ProcessRotation();
+	public void OnPlayerDeath() { // called by string reference
+		isControlEnabled = false;
 	}
 
 	private void ProcessRotation() {
@@ -43,9 +51,9 @@ public class Player : MonoBehaviour {
 
 	private void ProcessTranslation() {
 		xThrow = Input.GetAxis("Horizontal");
-		yThrow = Input.GetAxis("Vertical");
-		float xOffset = speed * xThrow * Time.deltaTime;
-		float yOffset = speed * yThrow * Time.deltaTime;
+		yThrow = Input.GetAxis("Vertical");  
+		float xOffset = controlSpeed * xThrow * Time.deltaTime;
+		float yOffset = controlSpeed * yThrow * Time.deltaTime;
 
 		float rawXPos = transform.localPosition.x + xOffset;
 		float clampedXPos = Mathf.Clamp(rawXPos, -xRange, xRange);
